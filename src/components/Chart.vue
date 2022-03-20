@@ -1,6 +1,6 @@
 <template>
   <div v-if="options.title">
-    <v-chart :options="options" style="width: 100%"/>
+    <v-chart :options="options" style="width: 100%; height: 200px;"/>
   </div>
 </template>
 

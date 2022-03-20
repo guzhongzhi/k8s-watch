@@ -1,10 +1,10 @@
 <template>
 <div style="border: solid 1px #e1e1e1; margin-bottom: 10px;">
-  <div style="font-size:16px;font-weight: bold">
+  <div style="font-size:16px;font-weight: bold;background: #e1e1e1;padding: 8px;">
     {{namespace+' '+deployment.name}}
   </div>
   <div v-for="pod in pods" style="margin-bottom: 10px; text-align: left;padding: 10px;">
-    <div style="font-weight: bold;color:#014b49;background: #bfe9ff;padding: 4px;">
+    <div style="font-weight: bold;color:#014b49;background: #bfe9ff;padding: 4px 6px;">
       {{pod.metadata.name}} - {{pod.status.podIP}}
     </div>
     <div v-for="witem in watchItems">
@@ -93,21 +93,26 @@ export default {
       var str = [];
       for (var p in obj)
         if (obj.hasOwnProperty(p)) {
-          str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+          str.push((p) + "=" + (obj[p]));
         }
       return str.join(sp);
     },
   },
   mounted() {
+    console.log(this.deployment);
+    let q = this.serialize(this.deployment.matchLabels);
+    console.log(q)
     let url = "/kapis/resources.kubesphere.io/v1alpha3/namespaces/"+encodeURIComponent(this.namespace)+
-      "/pods?limit=10&ownerKind=ReplicaSet&labelSelector=" + encodeURIComponent(this.serialize(this.deployment.matchLabels))+"&sortBy=startTime";
+      "/pods?limit=10&ownerKind=ReplicaSet&labelSelector=" + encodeURIComponent(q)+"&sortBy=startTime";
+
+
     this.$http.get(url).then(res=>{
       let pods = res.data.items;
       pods.map(pod=>{
         pod.watchData = [];
       })
       this.pods = pods;
-      setInterval(()=>{
+      setTimeout(()=>{
         this.watch();
       },5000);
     })
