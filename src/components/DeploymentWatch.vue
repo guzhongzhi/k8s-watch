@@ -1,7 +1,7 @@
 <template>
 <div style="border: solid 1px #e1e1e1; margin-bottom: 10px;">
   <div style="font-size:16px;font-weight: bold;background: #e1e1e1;padding: 8px;">
-    {{namespace+' -> '+deployment.name}} (共{{pods.length}}个Pods)
+    {{namespace+' -> '+deployment.name}} (共{{pods.length}}个Pods), CPU限制：, 内存限制: , 容器数量
   </div>
   <div v-for="pod in pods" style="margin-bottom: 10px; text-align: left;padding: 10px;">
     <div style="font-weight: bold;color:#014b49;background: #bfe9ff;padding: 4px 6px;">
