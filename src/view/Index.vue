@@ -1,9 +1,12 @@
 <template>
   <div class="hello">
     <div style="padding:10px;">
-      <Form ref="formInline" :model="formInline"  inline>
+
+
+
+      <Form ref="formInline" inline v-model="formInline">
         <FormItem prop="user">
-          <Input type="text" v-model="formInline.user" placeholder="Username">
+          <Input type="text" v-model="formInline.username" placeholder="Username">
             <Icon type="ios-person-outline" slot="prepend"></Icon>
           </Input>
         </FormItem>
@@ -13,22 +16,30 @@
           </Input>
         </FormItem>
         <FormItem>
-          <Button type="primary" @click="handleSubmit('formInline')">Signin</Button>
+          <Button type="primary" @click="handleSubmit('formInline')">Sign in</Button>
         </FormItem>
       </Form>
-      <pod-watch namespace="default" deployment="test-go"></pod-watch>
+
+
+
+    <div>
+          <div style="float: left;width:200px;margin-right: 10px;margin-left: 10px;" v-for="item in watchItems">
+            <deployment-watch :namespace="item.namespace" :deployment="item.deployment"></deployment-watch>
+          </div>
+      <div style="clear: both"></div>
+    </div>
     </div>
     <div>
-      {{pods}}
+      {{namespaces}}
     </div>
   </div>
 </template>
 
 <script>
-  import PodWatch from "../components/PodWatch";
+  import DeploymentWatch from "../components/DeploymentWatch";
 
   export default {
-    components: {PodWatch},
+    components: {DeploymentWatch},
     data () {
       return {
         formInline:{
@@ -38,6 +49,31 @@
         namespaces:[],
         pods:[],
         deployments:[],
+        watchItems:[
+          {
+            namespace:"default",
+            cluster:"default",
+            deployment: {
+              name:"test-go",
+              matchLabels:{
+                app:"test-go"
+              },
+            }
+          },
+          {
+            namespace:"weave",
+            cluster:"default",
+            deployment: {
+              name:"weave-scope-app",
+              matchLabels:{
+                app: "weave-scope",
+                name: "weave-scope-app",
+                "weave-cloud-component": "scope",
+                "weave-scope-component": "app",
+              },
+            }
+          }
+        ],
       }
     },
     mounted() {

@@ -1,5 +1,7 @@
 # test
 
+npm install echarts@4.1.0 vue-echarts@4.1.0
+
 > A Vue.js project
 
 ## Build Setup

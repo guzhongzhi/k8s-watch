@@ -11,12 +11,15 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "echarts": "^4.2.1",
     "moment": "^2.29.1",
     "view-design": "^4.5.0",
     "vue": "^2.5.2",
+    "vue-echarts": "^4.1.0",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {
+    "@vue/composition-api": "^1.4.9",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.22.1",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
