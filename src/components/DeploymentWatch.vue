@@ -1,15 +1,15 @@
 <template>
 <div style="border: solid 1px #e1e1e1; margin-bottom: 10px;">
   <div style="font-size:16px;font-weight: bold;background: #e1e1e1;padding: 8px;">
-    {{namespace+' '+deployment.name}}
+    {{namespace+' -> '+deployment.name}} (共{{pods.length}}个Pods)
   </div>
   <div v-for="pod in pods" style="margin-bottom: 10px; text-align: left;padding: 10px;">
     <div style="font-weight: bold;color:#014b49;background: #bfe9ff;padding: 4px 6px;">
       {{pod.metadata.name}} - {{pod.status.podIP}}
     </div>
     <div v-for="witem in watchItems">
-      <div style="color:red;padding: 4px 0px;"><strong>{{witem.title}}</strong></div>
-      <chart style="margin-top:-36px;" :data="{items:getWatchData(pod.watchData,witem.name),type:witem.name,title:witem.title}"/>
+      <div style="color:red;padding: 4px 0px;margin-top: 20px;"><strong>{{witem.title}}</strong></div>
+      <chart style="margin-top:-40px;" :data="{items:getWatchData(pod.watchData,witem.name),type:witem.name,title:witem.title}"/>
     </div>
   </div>
 </div>
@@ -83,11 +83,14 @@ export default {
           end:parseInt(this.$moment.now()/1000),
         }
         let url = "/kapis/monitoring.kubesphere.io/v1alpha3/namespaces/"+this.namespace+"/pods/"+pod.metadata.name+"?cluster=default&"+
-          this.serialize(q,"&")+"&step=30s&times=60&metrics_filter=pod_cpu_usage%7Cpod_memory_usage_wo_cache%7Cpod_net_bytes_transmitted%7Cpod_net_bytes_received%24";
+          this.serialize(q,"&")+"&step=30s&times=10&metrics_filter=pod_cpu_usage%7Cpod_memory_usage_wo_cache%7Cpod_net_bytes_transmitted%7Cpod_net_bytes_received%24";
         this.$http.get(url).then(res=>{
           pod.watchData=res.data.results;
         })
       })
+      setTimeout(()=>{
+        this.watch();
+      },5000);
     },
     serialize:function(obj,sp=",") {
       var str = [];
@@ -114,7 +117,7 @@ export default {
       this.pods = pods;
       setTimeout(()=>{
         this.watch();
-      },5000);
+      },1000);
     })
 
     return

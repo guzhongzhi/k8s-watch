@@ -2,6 +2,7 @@
   <div v-if="options.title">
     <v-chart :options="options" style="width: 100%; height: 200px;"/>
   </div>
+
 </template>
 
 <script>
@@ -24,39 +25,51 @@ export default {
     return {
       options:{
         title: {
-          text: '网络'
+          text: ''
         },
         tooltip: {
-          trigger: 'axis'
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            label: {
+              backgroundColor: '#6a7985'
+            }
+          }
         },
         legend: {
-          data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
+          data: ['pod_cpu_usage']
         },
         grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
+          left: '2%',
+          right: '2%',
+          bottom: '0',
           containLabel: true
         },
         toolbox: {
           feature: {
+            dataZoom: {
+              yAxisIndex: 'none'
+            },
+            restore: {},
             saveAsImage: {}
           }
         },
         xAxis: {
           type: 'category',
-          boundaryGap: false,
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          //type: 'time',
+          boundaryGap: true,
+          data:[],
         },
         yAxis: {
           type: 'value'
         },
         series: [
           {
-            name: 'Email',
+            name: 'pod_cpu_usage',
             type: 'line',
-            stack: 'Total',
-            data: [0, 0, 0, 0, 0, 0, 0]
+            showSymbol: false,
+            hoverAnimation: false,
+            data: []
           },
         ]
       },
@@ -68,7 +81,7 @@ export default {
       this.options.xAxis.data.splice(0)
       this.options.series[0].data.splice(0)
       n.items.map((i)=>{
-        let t = moment(i[0]*1000).format("hh:mm:ss")
+        let t = moment(i[0]*1000).format("HH:mm:ss")
         this.options.xAxis.data.push(t)
         let v = parseFloat(i[1])
 
@@ -76,12 +89,24 @@ export default {
           case "pod_cpu_usage":
             v =v * 1000;
             break;
-            case   "pod_memory_usage_wo_cache":
-              v = v / 1024 / 1024;
-              break;
+          case   "pod_memory_usage_wo_cache":
+             v = v / 1024 / 1024;
+             break;
+          case "pod_net_bytes_received":
+          case "pod_net_bytes_transmitted":
+            if(v > 0) {
+              v= v * 0.007648; //不知道怎么来的，　ks后台算出来是这个值
+            }
+            break;
         }
+
         this.options.series[0].data.push(v)
+        // this.options.series[0].data.push({
+        //   name: t,
+        //   value:[t,v]
+        // })
       })
+      console.log(this.options)
     }
   }
 }

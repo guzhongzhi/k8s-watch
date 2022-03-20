@@ -7,8 +7,8 @@
             <Icon type="ios-person-outline" slot="prepend"></Icon>
           </Input>
         </FormItem>
-        <FormItem prop="password">
-          <Input type="password" v-model="formInline.password" placeholder="Password">
+        <FormItem prop="password" style="width: 400px;">
+          <Input type="text" v-model="formInline.encrypt" placeholder="Password">
             <Icon type="ios-lock-outline" slot="prepend"></Icon>
           </Input>
         </FormItem>
@@ -16,7 +16,7 @@
           <Button type="primary" @click="handleSubmit('formInline')">Sign in</Button>
         </FormItem>
       </Form>
-      <div v-for="item in watchItems" style="border:solid 1px #e1e1e1;text-align: left;margin-top:10px;padding: 6px;">
+      <div v-for="(item,itemIdx) in watchItems" style="border:solid 1px #e1e1e1;text-align: left;margin-top:10px;padding: 6px;">
         <Form ref="formInline" inline>
           <FormItem label="cluster">
             <Input v-model="item.cluster"></Input>
@@ -34,14 +34,13 @@
                 <tr>
                   <td width="50%">{{key}}:</td>
                   <td><Input v-model="item.deployment.matchLabels[key]"></Input></td>
-                  <td><Button type="error">删除</Button></td>
                 </tr>
               </table>
             </div>
             </div>
           </FormItem>
           <FormItem>
-            <Button type="warning">删除主机</Button>
+            <Button type="warning" @click="deleteWatchItem(itemIdx)">删除主机</Button>
           </FormItem>
         </Form>
       </div>
@@ -57,7 +56,6 @@
             </Select>
           </FormItem>
           <FormItem label="deployment">
-            <Input v-model="newWatchItem.deployment.name"></Input>
             <Select v-model="newWatchItem.deployment.name" style="width:200px" @on-change="deploymentChanged">
               <Option v-for="item in deploymentsOptions" :value="item.value" :key="item.value">{{ item.label }}</Option>
             </Select>
@@ -78,7 +76,9 @@
             <Button type="warning" @click="newWatchItemAddMatchLabel">添加match label</Button>
           </FormItem>
         </Form>
+        <div style="text-align: center">
         <Button type="success" @click="addWatchDeployment">添加监控主机</Button>
+        </div>
       </div>
     <div style="margin-top: 10px;">
           <div style="float: left;width:48%;margin-left: 10px;" v-for="item in watchItems">
@@ -140,29 +140,16 @@
           newMatchLabel:"",
         },
         watchItems:[
-          {
-            namespace:"default",
-            cluster:"default",
-            deployment: {
-              name:"test-go",
-              matchLabels:{
-                app:"test-go"
-              },
-            }
-          },
-          {
-            namespace:"weave",
-            cluster:"default",
-            deployment: {
-              name:"weave-scope-app",
-              matchLabels:{
-                app: "weave-scope",
-                name: "weave-scope-app",
-                "weave-cloud-component": "scope",
-                "weave-scope-component": "app",
-              },
-            }
-          }
+          // {
+          //   namespace:"default",
+          //   cluster:"default",
+          //   deployment: {
+          //     name:"test-go",
+          //     matchLabels:{
+          //       app:"test-go"
+          //     },
+          //   }
+          // }
         ],
       }
     },
@@ -172,11 +159,28 @@
       })
     },
     methods:{
+      deleteWatchItem(idx){
+        this.watchItems.splice(idx,1)
+      },
       addWatchDeployment()  {
+        let e = false
+        this.watchItems.map((i)=>{
+          if(i.deployment.name == this.newWatchItem.deployment.name) {
+            e = true
+          }
+        })
+        if(e) {
+          this.$Message.error("该对象已经存在")
+          return
+        }
+        if(this.newWatchItem.namespace=="" || this.newWatchItem.deployment.name == "") {
+          this.$Message.error("请选择要监控的主机")
+          return
+        }
         this.watchItems.push(JSON.parse(JSON.stringify(this.newWatchItem)))
-        this.newWatchItem.deployment = "";
+        this.newWatchItem.deployment.name = "";
         Object.keys(this.newWatchItem.newMatchLabel).map(k=>{
-          this.$delete(this.newWatchItem.newMatchLabel,k)
+          this.$delete(this.newWatchItem.deployment.matchLabels,k)
         })
       },
       newWatchItemAddMatchLabel() {
