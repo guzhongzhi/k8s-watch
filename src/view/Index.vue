@@ -179,7 +179,7 @@
         }
         this.watchItems.push(JSON.parse(JSON.stringify(this.newWatchItem)))
         this.newWatchItem.deployment.name = "";
-        Object.keys(this.newWatchItem.newMatchLabel).map(k=>{
+        Object.keys(this.newWatchItem.deployment.matchLabels).map(k=>{
           this.$delete(this.newWatchItem.deployment.matchLabels,k)
         })
       },
